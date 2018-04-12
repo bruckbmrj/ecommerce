@@ -143,9 +143,22 @@ $app->get("/checkout", function(){
 
 	User::verifyLogin(false);
 
+	$address = new Address();
+
 	$cart = Cart::getFromSession();
 
-	$address = new Address();
+	if (isset($_GET['zipcode'])) {
+		
+		$address->loadFromCEP($_GET['zipcode']);
+
+		$cart->setdeszipcode($_GET['zipcode']);
+
+		$cart->save();
+
+		$cart->getCalculateTotal();
+		
+	}
+
 
 	$page = new Page();
 
@@ -153,6 +166,10 @@ $app->get("/checkout", function(){
 		'cart'=>$cart->getValues(),
 		'address'=>$address->getValues()
 	]);
+});
+
+$app->post("/checkout", function(){
+
 });
 
 $app->get("/login", function(){
