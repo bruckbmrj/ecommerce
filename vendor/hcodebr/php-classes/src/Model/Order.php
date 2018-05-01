@@ -4,6 +4,7 @@ namespace Hcode\Model;
 
 use \Hcode\DB\Sql;
 use \Hcode\Model;
+use \Hcode\Model\Cart;
 
 class Order extends Model
 {
@@ -36,7 +37,6 @@ class Order extends Model
 		$sql = new Sql();
 
 		$results = $sql->select("
-
 			SELECT * 
 			FROM tb_orders a
 			INNER JOIN tb_ordersstatus b USING(idstatus)
@@ -54,6 +54,39 @@ class Order extends Model
 		}
 
 	}	
+
+	public static function listAll(){
+		$sql = new Sql();
+
+		return $sql->select("
+			SELECT * 
+			FROM tb_orders a
+			INNER JOIN tb_ordersstatus b USING(idstatus)
+			INNER JOIN tb_carts c USING(idcart)
+			INNER JOIN tb_users d ON d.iduser = a.iduser
+			INNER JOIN tb_addresses e USING(idaddress)
+			INNER JOIN tb_persons f ON f.idperson = d.idperson
+			ORDER BY a.dtregister DESC
+		");
+	}
+
+	public function delete(){
+
+		$sql = new Sql();
+
+		$sql->query("DELETE FROM tb_orders WHERE idorder = :idorder", [
+			':idorder'=>$this->getidorder()
+		]);
+	}
+
+	public function getCart():Cart
+	{
+		$cart = new Cart();
+
+		$cart->get((int)$this->getidcart());
+
+		return $cart;
+	}
 
 }
 
